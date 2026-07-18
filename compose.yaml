@@ -13,9 +13,12 @@ services:
       context: .
     container_name: nestjs_api
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
+    env_file:
+      - .env
     ports:
       - ${PORT}:${PORT}
+    command: sh -c "npx prisma migrate dev --name auto_migration && yarn start:dev"
     depends_on:
       db:
        condition: service_healthy
@@ -26,14 +29,12 @@ services:
     container_name: nestjs_postgres
     volumes:
       - db-data:/var/lib/postgresql 
-    environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_DATABASE}
+    env_file:
+      - .env
     expose:
       - ${DB_PORT}
     healthcheck:
-      test: [ "CMD", "pg_isready" ]
+      test: ["CMD-SHELL", "pg_isready -U user -d nest_db"]
       interval: 10s
       timeout: 5s
       retries: 5

@@ -10,3 +10,31 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  password      String
+  lastLoginDate DateTime
+  expense       Expense[]
+}
+
+model Expense {
+  id         Int        @id @default(autoincrement())
+  userId     Int
+  title      String
+  categories Categories
+  date       DateTime
+  amount     Float
+  user       User       @relation(fields: [userId], references: [id])
+}
+
+enum Categories {
+  Groceries
+  Luxury
+  Electronics
+  Utilities
+  Clothing
+  Health
+  Others
+}
