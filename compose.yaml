@@ -22,6 +22,7 @@ services:
    
   db:
     image: postgres
+    restart: always
     container_name: nestjs_postgres
     volumes:
       - db-data:/var/lib/postgresql 
