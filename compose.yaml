@@ -1,43 +1,44 @@
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Docker Compose reference guide at
-# https://docs.docker.com/go/compose-spec-reference/
+version: "3.8"
 
-# Here the instructions define your application as a service called "server".
-# This service is built from the Dockerfile in the current directory.
-# You can add other services your application may depend on here, such as a
-# database or a cache. For examples, see the Awesome Compose repository:
-# https://github.com/docker/awesome-compose
 services:
-  server:
+  # NestJS Application Service
+  api:
     build:
       context: .
+      target: development
     container_name: nestjs_api
-    environment:
-      NODE_ENV: development
-    env_file:
-      - .env
+    command: sh -c "npx prisma generate && npx prisma migrate dev --name auto_migration && npm run start:dev"
     ports:
-      - ${PORT}:${PORT}
-    command: sh -c "npx prisma migrate dev --name auto_migration && yarn start:dev"
-    depends_on:
-      db:
-       condition: service_healthy
-   
-  db:
-    image: postgres
-    restart: always
-    container_name: nestjs_postgres
+      - "${PORT}:${PORT}"
     volumes:
-      - db-data:/var/lib/postgresql 
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
     env_file:
       - .env
-    expose:
-      - ${DB_PORT}
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://${DB_USERNAME}:${DB_PASSWORD}@postgres:${DB_PORT}/${DB_DATABASE}?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # PostgreSQL Database Service
+  postgres:
+    image: postgres:16-alpine
+    container_name: nestjs_postgres
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d nest_db"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
       timeout: 5s
       retries: 5
-volumes:
-  db-data:
 
+volumes:
+  postgres_data:

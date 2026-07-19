@@ -1,6 +1,4 @@
-ARG NODE_VERSION=22.18.0
-
-FROM node:${NODE_VERSION}-alpine
+FROM node:22-alpine AS development
 
 WORKDIR /usr/src/app
 
@@ -9,9 +7,6 @@ COPY yarn.lock .
 
 RUN yarn install --frozen-lockfile
 COPY . .
-RUN npx prisma generate
 
-
-EXPOSE 3000
 
 
