@@ -1,16 +1,26 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
+import { JwtService } from '@nestjs/jwt';
 
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly databaseService: DatabaseService) { }
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async signup(createAuthDto: CreateAuthDto) {
     const { email, password } = createAuthDto;
+    const alreadyExists = await this.databaseService.user.findUnique({
+      where: { email },
+    });
+    if (alreadyExists) {
+      throw new UnauthorizedException('User already exist');
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const data: Prisma.UserCreateInput = {
       email: email,
@@ -41,16 +51,12 @@ export class AuthService {
     if (!isValidPassword) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    
+    const accessToken = await this.jwtService.signAsync({ email });
     return {
-    message: 'login successfully',
-    data:{
-      token:
-    }
-    }
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+      message: 'login successfully',
+      data: {
+        accessToken: accessToken,
+      },
+    };
   }
 }
