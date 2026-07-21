@@ -1,23 +1,53 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { Prisma } from '@prisma/client';
+
 import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { DatabaseService } from '../database/database.service';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(private readonly databaseService: DatabaseService) { }
+
+  async signup(createAuthDto: CreateAuthDto) {
+    const { email, password } = createAuthDto;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const data: Prisma.UserCreateInput = {
+      email: email,
+      password: hashedPassword,
+      lastLoginDate: new Date(),
+    };
+    const result = await this.databaseService.user.create({
+      data: data,
+      select: {
+        email: true,
+      },
+    });
+    return {
+      message: 'new user registered successfully',
+      data: result,
+    };
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
+  async login(createAuthDto: CreateAuthDto) {
+    const { email, password } = createAuthDto;
+    const user = await this.databaseService.user.findUnique({
+      where: { email },
+    });
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    
+    return {
+    message: 'login successfully',
+    data:{
+      token:
+    }
+    }
   }
 
   remove(id: number) {
