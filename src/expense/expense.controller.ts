@@ -12,6 +12,8 @@ import { ExpenseService } from './expense.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { ExpensePayload } from './decorator/expense.decorator';
+import { JwtPayload } from '../types/jwt.payload';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('expense')
@@ -24,7 +26,8 @@ export class ExpenseController {
   }
 
   @Get()
-  findAll() {
+  findAll(@ExpensePayload() user: JwtPayload) {
+    console.log('user jwt', user);
     return this.expenseService.findAll();
   }
 
