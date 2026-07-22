@@ -13,7 +13,7 @@ import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ExpensePayload } from './decorator/expense.decorator';
-import { type JwtPayload } from '../types/jwt.payload';
+import { type JwtPayload } from '../../types/jwt.payload';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('expense')
