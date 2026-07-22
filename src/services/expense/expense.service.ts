@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateExpenseDto } from './dto/create-expense.dto';
-import { UpdateExpenseDto } from './dto/update-expense.dto';
+import { CreateExpenseDto, UpdateExpenseDto, FilterExpenseDto } from './dto';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()
@@ -18,9 +17,16 @@ export class ExpenseService {
     return result;
   }
 
-  findAll(userId: number) {
+  findAll(userId: number, filterExpenseDto: FilterExpenseDto) {
+    const { to, from } = filterExpenseDto;
     const result = this.databaseService.expense.findMany({
-      where: { userId: userId },
+      where: {
+        userId: userId,
+        date: {
+          ...(from && { gte: new Date(from) }),
+          ...(to && { lte: new Date(to) }),
+        },
+      },
     });
     return result;
   }

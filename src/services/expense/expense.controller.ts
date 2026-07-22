@@ -7,10 +7,10 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
-import { CreateExpenseDto } from './dto/create-expense.dto';
-import { UpdateExpenseDto } from './dto/update-expense.dto';
+import { CreateExpenseDto, UpdateExpenseDto, FilterExpenseDto } from './dto/';
 import { AuthGuard } from '@nestjs/passport';
 import { ExpensePayload } from './decorator/expense.decorator';
 import { type JwtPayload } from '../../types/jwt.payload';
@@ -29,8 +29,11 @@ export class ExpenseController {
   }
 
   @Get('list')
-  findAll(@ExpensePayload() user: JwtPayload) {
-    return this.expenseService.findAll(user.userId);
+  findAll(
+    @ExpensePayload() user: JwtPayload,
+    @Query() filterExpenseDto: FilterExpenseDto,
+  ) {
+    return this.expenseService.findAll(user.userId, filterExpenseDto);
   }
 
   @Get('list/:id')
