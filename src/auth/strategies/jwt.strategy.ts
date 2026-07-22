@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { JwtPayload } from '../../types/jwt.payload';
+import { type JwtPayload } from '../../types/jwt.payload';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 @Injectable()
@@ -14,10 +14,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   // Runs automatically once the signature is successfully verified
-  validate(payload: { email: string; id: string }): JwtPayload {
+  validate(payload: JwtPayload): JwtPayload {
     if (!payload) {
       throw new UnauthorizedException();
     }
-    return { userId: payload.id, email: payload.email };
+    return { userId: payload.userId, email: payload.email };
   }
 }
