@@ -23,7 +23,17 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+This is a backend API for an expense tracking application. It allows users to authenticate and manage their personal expenses by categorizing them into the following types:
+
+- Groceries
+- Luxury
+- Electronics
+- Utilities
+- Clothing
+- Health
+- Others
+
+Each user can securely log in and create, update, view, and manage their own expense records.
 
 ## Project setup
 
