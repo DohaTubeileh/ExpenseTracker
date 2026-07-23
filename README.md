@@ -23,7 +23,7 @@
 
 ## Description
 
-This is a backend API for an expense tracking application. It allows users to authenticate and manage their personal expenses by categorizing them into the following types:
+This is a backend API with postgres database for an expense tracking application. It allows users to authenticate and manage their personal expenses by categorizing them into the following types:
 
 - Groceries
 - Luxury
@@ -35,11 +35,13 @@ This is a backend API for an expense tracking application. It allows users to au
 
 Each user can securely log in and create, update, view, and manage their own expense records.
 
-## Project setup
+## Docker run for the project
 
 ```bash
-$ yarn install
+# development
+$ docker compose up --build
 ```
+
 
 ## Compile and run the project
 
